@@ -17,7 +17,7 @@ func HandleConnection(s *melody.Session) {
 
 // HandleMessage handles any message from a client or server, routing it accordingly.
 func HandleMessage(s *melody.Session, msg []byte) {
-	handlers.HandleEvent(msg)
+	handlers.HandleEvent(s, msg)
 }
 
 // HandleDisconnection handles a disconnection of a server or client.

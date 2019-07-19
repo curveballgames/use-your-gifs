@@ -44,5 +44,5 @@ func handleNewPlayer(eventPayload map[string]interface{}, clientSession *melody.
 
 // handleNewPlayer handles a client connecting.
 func handleStartGame(eventPayload map[string]interface{}, clientSession *melody.Session) {
-	server.StartGame(roomCode)
+	server.StartGame(eventPayload["room_code"].(string))
 }
