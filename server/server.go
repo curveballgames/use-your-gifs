@@ -10,6 +10,10 @@ import (
 	"github.com/olahol/melody"
 )
 
+const (
+	minPlayers = 3
+)
+
 var (
 	connections = make(map[string]*melody.Session)
 )
@@ -60,7 +64,12 @@ func StartGame(roomCode string) error {
 		return errors.New("No room with given room code")
 	}
 
+	if client.GetNumPlayers(roomCode) < minPlayers {
+		return errors.New("Not enough players have joined the game")
+	}
+
 	connections[roomCode].Write(event.CreateStartGameEvent())
+	client.StartGameForAll(roomCode)
 
 	return nil
 }

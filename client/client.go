@@ -1,4 +1,4 @@
-// Pakcage client defines logic for associated with the clients, or "players" of the game.
+// Package client defines logic for associated with the clients, or "players" of the game.
 package client
 
 import (
@@ -15,7 +15,9 @@ type (
 
 	// Room is a room full of players, keyed by name.
 	Room struct {
-		Players map[string]*Player
+		Players                map[string]*Player
+		PlayerOrder            []string
+		CurrentControllerIndex int
 	}
 )
 
@@ -86,6 +88,41 @@ func DisconnectAll(roomCode string) {
 	}
 
 	delete(roomToPlayersMap, roomCode)
+}
+
+// StartGameForAll starts the game for all players in a room.
+func StartGameForAll(roomCode string) {
+	room := roomToPlayersMap[roomCode]
+
+	if room == nil {
+		return
+	}
+
+	for playerName := range room.Players {
+		room.Players[playerName].ClientSession.Write(event.CreateGameStartedEvent())
+	}
+}
+
+// StartNewRound has the next "controller" submit a prompt for others to complete.
+func StartNewRound(roomCode string, selectedPlayer string) []byte {
+	room := roomToPlayersMap[roomCode]
+
+	evt := event.CreateNewRoundEvent(selectedPlayer)
+
+	for playerName := range room.Players {
+		room.Players[playerName].ClientSession.Write(evt)
+	}
+
+	return evt
+}
+
+// GetNumPlayers gets the number of players in a room.
+func GetNumPlayers(roomCode string) int {
+	if roomToPlayersMap[roomCode] == nil {
+		return 0
+	}
+
+	return len(roomToPlayersMap[roomCode].Players)
 }
 
 func (r *Room) addPlayer(playerName string, clientSession *melody.Session) {

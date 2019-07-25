@@ -12,6 +12,7 @@ type (
 	// ErrorEvent defines an error from the server.
 	ErrorEvent struct {
 		Type         string `json:"type"`
+		Subtype      string `json:"subType"`
 		ErrorMessage string `json:"error_message"`
 	}
 
@@ -23,9 +24,10 @@ type (
 )
 
 // CreateErrorEvent creates a WebSocket-ready error payload.
-func CreateErrorEvent(e error) []byte {
+func CreateErrorEvent(e error, subtype string) []byte {
 	evt, err := json.Marshal(ErrorEvent{
 		Type:         "error",
+		Subtype:      subtype,
 		ErrorMessage: e.Error(),
 	})
 
